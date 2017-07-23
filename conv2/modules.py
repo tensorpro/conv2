@@ -163,10 +163,12 @@ test_conv(6, padding=1)
 test_conv(6, padding=1)
 
 
-print('Conversion works for odd input same padding, strided')
+print('Conversion works for odd input same padding, strided even but NOT odd')
 test_conv(5, padding=1, stride=2)
-test_conv(5, padding=1, stride=2)
+test_conv(5, padding=1, stride=3)
+test_conv(9, padding=1, stride=4)
+test_conv(9, padding=1, stride=5)
 
 print('Conversion fails for even input same padding, strided')
 test_conv(6, padding=1, stride=2)
-test_conv(6, padding=1, stride=2)
+test_conv(6, padding=1, stride=3)
