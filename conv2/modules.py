@@ -117,26 +117,26 @@ def conv(tconv):
 def pt_out_conversion(pt_out):
     return np.transpose(pt_out.data.numpy(), [0,2,3,1])
 
-def test_conv(N=5, stride=1, padding=1, k=3, in_channels=2, out_channels=3):
+def test_conv(N=5, stride=1, padding=0, k=3, in_channels=2, out_channels=3):
+    print("N={0} Stride={1}, padding={2}, k={3}".format(N,stride,padding,k))
     inp = np.random.random((1,N,N,in_channels)).astype(np.float32)
     inp_tf = tf.convert_to_tensor(inp)
     inp_pt = Variable(torch.Tensor(inp.transpose([0,3,1,2])))
-    print("Conv test")
     c_pt = nn.Conv2d(in_channels,out_channels,
                      k, padding=padding,stride=stride, bias=False)
     # c_pt = conv3x3(2,3,1)
     c_tf = conv(c_pt)
     tf_out = c_tf(inp_tf)
     pt_out = convert_torchout(c_pt(inp_pt))
-    print(tf_out)
-    print(pt_out)
-    print(np.isclose(pt_out, tf_out))
-    print(tf_out).shape
-    print(pt_out).shape
+    # print(tf_out)
+    # print(pt_out)
+    print(np.all(np.isclose(pt_out, tf_out)))
+    # print(tf_out).shape
+    # print(pt_out).sphape
     # print(np.isclose(pt_out, tf_out))
     return c_tf, c_pt
     
-ctf, cpt = test_conv()
+# ctf, cpt = test_conv()
 def test_bn():
     tbn = nn.BatchNorm2d(2).eval()
     tfbn = bn(tbn)
@@ -145,4 +145,28 @@ def test_bn():
     return tbn, tfbn
 
 # tbn,tfbn = test_bn()
-    
+
+print('conversion works on odd input size')
+test_conv(5)
+print('Conversion works for basic even input size')
+test_conv(6)
+print('Conversion works for even input size with various stride')
+test_conv(6, stride=2)
+test_conv(6, stride=3)
+
+print('Conversion works for odd input same padding')
+test_conv(5, padding=1)
+test_conv(5, padding=1)
+
+print('Conversion works for even input same padding')
+test_conv(6, padding=1)
+test_conv(6, padding=1)
+
+
+print('Conversion works for odd input same padding, strided')
+test_conv(5, padding=1, stride=2)
+test_conv(5, padding=1, stride=2)
+
+print('Conversion fails for even input same padding, strided')
+test_conv(6, padding=1, stride=2)
+test_conv(6, padding=1, stride=2)
